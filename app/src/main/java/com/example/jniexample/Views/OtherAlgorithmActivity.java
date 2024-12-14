@@ -89,7 +89,8 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     long number = Integer.parseInt(inputNumber.getText().toString());
                     long result = performanceUtils.measureExecutionTime("Java", () -> controller.fibonacciJava(number));
-                    javaResultTV.setText(result+" ns");
+                    double elapsedTimeByMilisecond = (double) result / 1000000;
+                    javaResultTV.setText(elapsedTimeByMilisecond+" ms");
                 }catch (Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -103,7 +104,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     int number = Integer.parseInt(inputNumber.getText().toString());
                     long result = performanceUtils.measureExecutionTime("Native", () -> fibonacciNative(number));
-                    nativeResultTV.setText(result+" ns");
+                    double elapsedTimeByMilisecond = (double) result / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    nativeResultTV.setText(formattedTime+" ms");
                 }catch (Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -119,7 +122,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     double radius = Double.parseDouble(inputNumber.getText().toString());
                     long result = performanceUtils.measureExecutionTime("Java", () -> controller.calculateCircleAreaJava(radius));
-                    javaResultTV.setText(result+" ns");
+                    double elapsedTimeByMilisecond = (double) result / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    javaResultTV.setText(formattedTime+" ms");
                 }catch (Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -134,7 +139,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     double radius = Double.parseDouble(inputNumber.getText().toString());
                     long result = performanceUtils.measureExecutionTime("Native", () -> calculateCircleAreaNative(radius));
-                    nativeResultTV.setText(result+" ns");
+                    double elapsedTimeByMilisecond = (double) result / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    nativeResultTV.setText(formattedTime+" ms");
                 }catch (Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -162,12 +169,15 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                             }
                             return null;
                         });
-                        javaCheckingResultTV.setText(String.format("JNI Latency: %d ns\n", jniLatency));
+
+                        double elapsedTimeByMilisecond = (double) jniLatency / 1000000;
+                        String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                        javaCheckingResultTV.setText("JNI Latency: " +formattedTime+ " ms");
                     }else{
                         Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                     }
                 }catch(Exception e){
-                    Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OtherAlgorithmActivity.this, "Invalid input 11 "+ e.toString(), Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -181,7 +191,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
               try {
                     int number = Integer.parseInt(inputCheckingNumber.getText().toString());
                     long javaIntTime = performanceUtils.measureExecutionTime("Memory access java",() -> controller.javaMemoryAccessTest(number));
-                    javaCheckingResultTV.setText(String.format("Memory access: %d ns\n", javaIntTime));
+                  double elapsedTimeByMilisecond = (double) javaIntTime / 1000000;
+                  String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    javaCheckingResultTV.setText("Memory access: " +  formattedTime +  " ms");
                 }catch(Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -194,7 +206,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     int number = Integer.parseInt(inputCheckingNumber.getText().toString());
                     long nativeIntTime = nativeMemoryAccessTest(number);
-                    nativeCheckingResultTV.setText(String.format("Memory access: %d ns\n", nativeIntTime));
+                    double elapsedTimeByMilisecond = (double) nativeIntTime / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    nativeCheckingResultTV.setText( "Memory access: " + formattedTime + " ms");
                 }catch(Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -208,8 +222,10 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     int number = Integer.parseInt(inputCheckingNumber.getText().toString());
-                    long javaStringTime = performanceUtils.measureExecutionTime("String Processing Java",() -> controller.javaStringProcessingTest(number)); ;
-                    javaCheckingResultTV.setText(String.format("String processing: %d ns\n", javaStringTime));
+                    long javaStringTime = performanceUtils.measureExecutionTime("String Processing Java",() -> controller.javaStringProcessingTest(number));
+                    double elapsedTimeByMilisecond = (double) javaStringTime / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    javaCheckingResultTV.setText("String processing: " + formattedTime + " ms");
                 }catch(Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -223,7 +239,9 @@ public class OtherAlgorithmActivity extends AppCompatActivity {
                 try {
                     int number = Integer.parseInt(inputCheckingNumber.getText().toString());
                     long nativeStringTime =  performanceUtils.measureExecutionTime("String Processing Native",() -> nativeStringProcessingTest(number));
-                    nativeCheckingResultTV.setText(String.format("String processing: %d ns\n", nativeStringTime));
+                    double elapsedTimeByMilisecond = (double) nativeStringTime / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    nativeCheckingResultTV.setText("String processing: " + formattedTime + " ms");
                 }catch (Exception e){
                     Toast.makeText(OtherAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }

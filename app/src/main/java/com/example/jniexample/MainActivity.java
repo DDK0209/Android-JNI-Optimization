@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void bindings(){
         searchBinaryButton = binding.searchBinaryButton;
-        bundleSortButton = binding.bundleSortButton;
+        bundleSortButton = binding.quickSortButton;
     }
     private void onClick(){
         bundleSortButton.setOnClickListener(new View.OnClickListener() {

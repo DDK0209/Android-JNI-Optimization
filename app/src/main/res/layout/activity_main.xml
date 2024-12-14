@@ -36,8 +36,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Bundle sort"
-                    android:id="@+id/bundleSortButton"
+                    android:text="Quick sort"
+                    android:id="@+id/quickSortButton"
                     android:layout_marginHorizontal="20dp"
                     ></Button>
                 <Button

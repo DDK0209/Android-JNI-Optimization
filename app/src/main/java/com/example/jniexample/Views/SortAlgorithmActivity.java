@@ -12,8 +12,6 @@ import android.widget.Toast;
 
 import com.example.jniexample.Constants.AppConstants;
 import com.example.jniexample.Controllers.BasicController;
-import com.example.jniexample.MainActivity;
-import com.example.jniexample.R;
 import com.example.jniexample.Utils.PerformanceUtils;
 import com.example.jniexample.Utils.ToolBarUtils;
 import com.example.jniexample.data.SearchResult;
@@ -27,9 +25,6 @@ public class SortAlgorithmActivity extends AppCompatActivity {
 
     private ActivitySortAlgorithmBinding binding;
 
-    static {
-        System.loadLibrary("jniexample");
-    }
 
 
     private  long[] sharedArray;
@@ -47,7 +42,7 @@ public class SortAlgorithmActivity extends AppCompatActivity {
     EditText inputNumberSoft,targetNumber;
     TextView javaResultTV,nativeResultTV,comparisonText;
     TextView sortedArrayJavaView,sortedArrayNativeView,unsortedArrayView;
-    Button javaButton,nativeButton;
+    Button javaButton,nativeButton,createArrayButton;
     Button javaSearchButton,nativeSearchButton;
     TextView searchResultView,searchComparisonView,searchJavaResult,searchNativeResult;
 
@@ -87,6 +82,7 @@ public class SortAlgorithmActivity extends AppCompatActivity {
         sortedArrayNativeView= binding.sortedArrayNativeView;
         sortedArrayJavaView= binding.sortedArrayJavaView;
         unsortedArrayView= binding.unsortedArrayView;
+        createArrayButton = binding.createArrayButton;
 
 //        search
         javaSearchButton= binding.searchJavaButton;
@@ -99,8 +95,30 @@ public class SortAlgorithmActivity extends AppCompatActivity {
 
     }
     private void onClick(){
+        onCreateArrayEvent();
         onHandleSortClick();
         onHandleSearchClick();
+    }
+
+    private void onCreateArrayEvent(){
+        createArrayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    String input = inputNumberSoft.getText().toString();
+                    int number = Integer.parseInt(input);
+                    if(number  >= AppConstants.MAX_SIZE){
+                        Toast.makeText(SortAlgorithmActivity.this, "Too large number. Please input smaller number", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    updateSelectedNumber(number);
+                    ensureArrayExists(number);
+                }catch (Exception e){
+                    Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
     }
     private void onHandleSortClick(){
         onHandleSortByJava();
@@ -115,40 +133,38 @@ public class SortAlgorithmActivity extends AppCompatActivity {
         javaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String input = inputNumberSoft.getText().toString();
+
                 try{
+                    String input = inputNumberSoft.getText().toString();
                     int number = Integer.parseInt(input);
-                    if(number  >= AppConstants.MAX_SIZE){
-                        Toast.makeText(SortAlgorithmActivity.this, "Too large number. Please input smaller number", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    updateSelectedNumber(number);
-                    ensureArrayExists(number);
                     // Chạy sắp xếp trong background thread bằng ExecutorService
-                    ExecutorService executor = Executors.newSingleThreadExecutor();
-                    executor.submit(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            // Measure time and do sorting in background
+                            // Code chạy trên background thread
                             long[] arrayCopy = sharedArray.clone();
                             long result = performanceUtils.measureExecutionTime("Java", () -> {
-                                sortedArray = controller.quickSort(arrayCopy,0,arrayCopy.length-1);
+                                sortedArray = controller.quickSort(arrayCopy, 0, arrayCopy.length - 1);
                                 return sortedArray;
                             });
+                            javaResult = result;
 
-                            javaResult=result;
-                            // Update results to UI thread
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    javaResultTV.setText(result+" ns");
-                                    onChangeComparisonVisible(number);
-                                    sortedArrayJavaView.setText(Arrays.toString(sortedArray));
-                                }
+                            // Quay lại UI thread
+                            runOnUiThread(() -> {
+                                double elapsedTimeByMilisecond = (double) result / 1000000;
+                                String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                                javaResultTV.setText(formattedTime + " ms");
+                                onChangeComparisonVisible(number);
+                                sortedArrayJavaView.setText(Arrays.toString(sortedArray));
+                                // Hiển thị một phần mảng (ví dụ: 100 phần tử đầu tiên)
+                                int displayLimit = 100;
+                                String displayArray = Arrays.toString(
+                                        Arrays.copyOfRange(sortedArray, 0, Math.min(sortedArray.length, displayLimit))
+                                );
+                                sortedArrayJavaView.setText(displayArray);
                             });
                         }
-                    });
-                    executor.shutdown();
+                    }).start();
                 }catch(Exception e){
                     Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_LONG).show();
                 }
@@ -160,39 +176,61 @@ public class SortAlgorithmActivity extends AppCompatActivity {
         nativeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String input = inputNumberSoft.getText().toString();
                 try {
+                    String input = inputNumberSoft.getText().toString();
                     int number = Integer.parseInt(input);
-                    if(number >= AppConstants.MAX_SIZE){
-                        Toast.makeText(SortAlgorithmActivity.this, "Too large number. Please input smaller number", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    updateSelectedNumber(number);
-                    ensureArrayExists(number);
-                    ExecutorService executor = Executors.newSingleThreadExecutor();
-                    executor.submit(new Runnable() {
+//                    ExecutorService executor = Executors.newSingleThreadExecutor();
+//                    executor.submit(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            long[] arrayCopy = sharedArray.clone();
+//                            long result =
+//                                    performanceUtils.measureExecutionTime("Native", () -> {
+//                                return  qsort(arrayCopy,arrayCopy.length);
+////                                 null;
+//                            });
+//                            System.out.println("Time taken by JNI QuickSort: " + (result) + " nanoseconds");
+//                            nativeResult=result;
+//                            // Update results to UI thread
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    double elapsedTimeByMilisecond = (double) result / 1000000;
+//                                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+//                                    nativeResultTV.setText(formattedTime+" ms");
+//                                    onChangeComparisonVisible(number);
+//                                    sortedArrayNativeView.setText(Arrays.toString(sortedArray));
+//                                }
+//                            });
+//                        }
+//                    });
+//                    executor.shutdown();
+
+
+
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            // Code chạy trên background thread
                             long[] arrayCopy = sharedArray.clone();
                             long result =
                                     performanceUtils.measureExecutionTime("Native", () -> {
-                                return  qsort(arrayCopy,arrayCopy.length);
+                                        return  qsort(arrayCopy,arrayCopy.length);
 //                                 null;
-                            });
+                                    });
                             System.out.println("Time taken by JNI QuickSort: " + (result) + " nanoseconds");
                             nativeResult=result;
-                            // Update results to UI thread
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    nativeResultTV.setText(result+" ns");
-                                    onChangeComparisonVisible(number);
-                                    sortedArrayNativeView.setText(Arrays.toString(sortedArray));
-                                }
+
+                            // Quay lại UI thread
+                            runOnUiThread(() -> {
+                                double elapsedTimeByMilisecond = (double) result / 1000000;
+                                String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                                nativeResultTV.setText(formattedTime+" ms");
+                                onChangeComparisonVisible(number);
+                                sortedArrayNativeView.setText(Arrays.toString(sortedArray));
                             });
                         }
-                    });
-                    executor.shutdown();
+                    }).start();
                 }catch(Exception e){
                     Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 }
@@ -225,7 +263,9 @@ public class SortAlgorithmActivity extends AppCompatActivity {
                     searchResult= searchResultModel.getResult();
                     searchResultView.setText(searchResult+"");
                     long elapsedTime=searchResultModel.getElapsedTime();
-                    searchNativeResult.setText(elapsedTime+" ns");
+                    double elapsedTimeByMilisecond = (double) elapsedTime / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    searchNativeResult.setText(formattedTime +" ms");
                     sortedArrayJavaView.setText(Arrays.toString(sortedArray));
                 }catch (Exception e){
                     Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
@@ -255,7 +295,9 @@ public class SortAlgorithmActivity extends AppCompatActivity {
                     });
                     searchResultView.setText(searchResult+"");
                     nativeResult=result;
-                    searchJavaResult.setText(result+" ns");
+                    double elapsedTimeByMilisecond = (double) result / 1000000;
+                    String formattedTime = String.format("%.6f", elapsedTimeByMilisecond);
+                    searchJavaResult.setText(formattedTime+" ms");
                     sortedArrayJavaView.setText(Arrays.toString(sortedArray));
                 }catch (Exception e){
                     Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
@@ -267,6 +309,7 @@ public class SortAlgorithmActivity extends AppCompatActivity {
 
     private void ensureArrayExists(int size) {
 //        if (sharedArray == null || sharedArray.length != size) {
+        unsortedArrayView.setText("");
             sharedArray = new long[size];
             for (int i = 0; i < size; i++) {
                 sharedArray[i] =  size - i;
