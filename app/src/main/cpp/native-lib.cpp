@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #define PI 3.141592653589793
+#include <vector>
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_example_jniexample_MainActivity_stringFromJNI(
@@ -57,7 +58,7 @@ Java_com_example_jniexample_Views_SortAlgorithmActivity_nativeSort(JNIEnv *env, 
 
 
 // others
-extern "C" JNIEXPORT jdouble JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT jdouble JNICALL
 Java_com_example_jniexample_Views_OtherAlgorithmActivity_calculateCircleAreaNative(JNIEnv *env, jobject obj, jdouble radius) {
     return PI * radius * radius;
 }
@@ -77,7 +78,7 @@ Java_com_example_jniexample_Views_OtherAlgorithmActivity_fibonacciNative(
     return result;
 }
 
-extern "C" JNIEXPORT void JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT void JNICALL
 Java_com_example_jniexample_Views_OtherAlgorithmActivity_callEmptyNativeFunction(JNIEnv *env, jobject obj) {
     // Do nothing, just measure latency when calling JNI
 }
@@ -108,7 +109,7 @@ Java_com_example_jniexample_Views_OtherAlgorithmActivity_nativeMemoryAccessTest(
 
 
 
-extern "C" JNIEXPORT jlong JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT jlong JNICALL
 Java_com_example_jniexample_Views_OtherAlgorithmActivity_nativeStringProcessingTest(JNIEnv *env, jobject obj,jint length) {
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -144,7 +145,7 @@ Java_com_example_jniexample_Views_SortAlgorithmActivity_bubbleSortJNI(JNIEnv *en
     return oldValues;
 }
 
-extern "C" JNIEXPORT jlongArray JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT jlongArray JNICALL
 Java_com_example_jniexample_Views_SortAlgorithmActivity_qsort(JNIEnv* env, jobject instance,
                                         jlongArray arr, jlong arrayLength) {
     jlong *carr;
@@ -202,7 +203,7 @@ void exchange(jlong i, jlong j,jlong *numbers) {
 }
 
 
-extern "C" JNIEXPORT jint JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT jint JNICALL
 Java_com_example_jniexample_Views_SortAlgorithmActivity_binarySearch(JNIEnv *env, jobject instance,
                                                                      jintArray arr,
                                                                      jint arrayLength,
@@ -232,7 +233,7 @@ Java_com_example_jniexample_Views_SortAlgorithmActivity_binarySearch(JNIEnv *env
 }
 
 
-extern "C" JNIEXPORT jobject JNICALL
+extern "C" __attribute__((unused)) JNIEXPORT jobject JNICALL
 Java_com_example_jniexample_Views_SortAlgorithmActivity_binarySearchAndMeasureTime(JNIEnv *env, jobject instance,
                                                                                    jlongArray arr, jlong target) {
     jlong *array = env->GetLongArrayElements(arr, NULL);
@@ -277,4 +278,36 @@ Java_com_example_jniexample_Views_SortAlgorithmActivity_binarySearchAndMeasureTi
     jobject resultObj = env->NewObject(resultClass, constructor, result, jElapsedTime);
 
     return resultObj;
+}
+
+
+
+extern "C" __attribute__((unused)) JNIEXPORT jintArray JNICALL
+Java_com_example_jniexample_Views_MatrixActivity_multiplyMatricesNative(JNIEnv *env, jclass clazz, jintArray a, jintArray b, jint n) {
+    // Lấy con trỏ tới mảng của Java
+    jint *A = env->GetIntArrayElements(a, nullptr);
+    jint *B = env->GetIntArrayElements(b, nullptr);
+
+    // Tạo mảng kết quả trực tiếp trong JNI (không sử dụng std::vector)
+    jintArray result = env->NewIntArray(n * n);
+    jint *C = env->GetIntArrayElements(result, nullptr);  // Mảng kết quả được cấp phát trực tiếp
+
+    // Phép nhân ma trận
+    for (int i = 0; i < n; i++) {
+        for (int k = 0; k < n; k++) {  // Lặp qua các dòng của A
+            for (int j = 0; j < n; j++) {  // Lặp qua các cột của B
+                C[i * n + j] += A[i * n + k] * B[k * n + j];
+            }
+        }
+    }
+
+    // Đưa kết quả vào mảng Java
+    env->SetIntArrayRegion(result, 0, n * n, C);
+
+    // Giải phóng bộ nhớ
+    env->ReleaseIntArrayElements(a, A, JNI_ABORT);
+    env->ReleaseIntArrayElements(b, B, JNI_ABORT);
+    env->ReleaseIntArrayElements(result, C, 0);  // Giải phóng mảng kết quả
+
+    return result;
 }

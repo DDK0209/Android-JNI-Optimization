@@ -137,7 +137,7 @@ public class SortAlgorithmActivity extends AppCompatActivity {
                 try{
                     String input = inputNumberSoft.getText().toString();
                     int number = Integer.parseInt(input);
-                    // Chạy sắp xếp trong background thread bằng ExecutorService
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -165,6 +165,7 @@ public class SortAlgorithmActivity extends AppCompatActivity {
                             });
                         }
                     }).start();
+                    qsort(sortedArray,sortedArray.length);
                 }catch(Exception e){
                     Toast.makeText(SortAlgorithmActivity.this, "Invalid input", Toast.LENGTH_LONG).show();
                 }

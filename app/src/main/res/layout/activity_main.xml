@@ -49,6 +49,15 @@
                     android:layout_marginHorizontal="20dp"
                     ></Button>
             </LinearLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:gravity="center"
+                android:text="Matrix"
+                android:onClick="onMatrixClick"
+                ></Button>
         </LinearLayout>
     </LinearLayout>
 

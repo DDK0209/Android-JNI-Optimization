@@ -1,5 +1,7 @@
 package com.example.jniexample.Controllers;
 
+import java.util.Random;
+
 public class BasicController {
     public long fibonacciJava(long number) {
         if (number <= 1) return number;
@@ -129,6 +131,63 @@ public class BasicController {
         }
 
         return -1;
+    }
+
+
+    public int[][] multiplyMatrices(int[][] matrixA, int[][] matrixB) {
+        int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int colsB = matrixB[0].length;
+
+        int[][] result = new int[rowsA][colsB];
+
+        // Nhân ma trận
+        for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsB; j++) {
+                for (int k = 0; k < colsA; k++) {
+                    result[i][j] += matrixA[i][k] * matrixB[k][j];
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    public static int[][] generateRandomMatrix(int rows) {
+        Random rand = new Random();
+        int[][] matrix = new int[rows][rows];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < rows; j++) {
+                matrix[i][j] = rand.nextInt(10);
+            }
+        }
+        return matrix;
+    }
+
+
+
+    public static int[] multiplyMatricesJava(int[] a, int[] b, int n) {
+        int[] c = new int[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    c[i * n + j] += a[i * n + k] * b[k * n + j];
+                }
+            }
+        }
+        return c;
+    }
+
+    public static int[] convert2DTo1D(int[][] matrix) {
+        int n = matrix.length;
+        int[] result = new int[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                result[i * n + j] = matrix[i][j];
+            }
+        }
+        return result;
     }
 
 }

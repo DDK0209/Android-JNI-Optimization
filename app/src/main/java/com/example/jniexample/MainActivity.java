@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jniexample.Utils.PerformanceUtils;
+import com.example.jniexample.Views.MatrixActivity;
 import com.example.jniexample.Views.OtherAlgorithmActivity;
 import com.example.jniexample.Views.SortAlgorithmActivity;
 import com.example.jniexample.databinding.ActivityMainBinding;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         bindings();
         initialize();
         onClick();
+
+
     }
     private void initialize(){
         performanceUtils= new PerformanceUtils();
@@ -69,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void onMatrixClick(View view)
+    {
+        Intent intent = new Intent(MainActivity.this, MatrixActivity.class);
+        startActivity(intent);
     }
 
     /**
