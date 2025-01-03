@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jniexample.Utils.PerformanceUtils;
+import com.example.jniexample.Views.ImageTestActivity;
 import com.example.jniexample.Views.MatrixActivity;
 import com.example.jniexample.Views.OtherAlgorithmActivity;
 import com.example.jniexample.Views.SortAlgorithmActivity;
@@ -77,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
     public void onMatrixClick(View view)
     {
         Intent intent = new Intent(MainActivity.this, MatrixActivity.class);
+        startActivity(intent);
+    }
+
+    public void onImageTestClick(View view)
+    {
+        Intent intent = new Intent(MainActivity.this, ImageTestActivity.class);
         startActivity(intent);
     }
 
